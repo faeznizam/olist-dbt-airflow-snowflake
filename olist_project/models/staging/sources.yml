@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: olist_raw
+    database: OLIST
+    schema: PUBLIC
+    tables:
+      - name: raw_customer
+      - name: raw_geolocation
+      - name: raw_order
+      - name: raw_order_item
+      - name: raw_order_payment
+      - name: raw_order_review
+      - name: raw_product
+      - name: raw_product_category_mapping
+      - name: raw_sellers
