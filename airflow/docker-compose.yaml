@@ -336,3 +336,8 @@ services:
 
 volumes:
   postgres-db-volume:
+
+networks:
+  default:
+    external: true
+    name: airflow_fixed_network
