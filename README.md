@@ -99,7 +99,7 @@ erDiagram
   - A many-to-one duplication issue in raw geolocation data - resolved with a window-function deduplication (`ROW_NUMBER()` partitioned by zip code).
 - **Slowly Changing Dimension (Type 2)** history tracking on `dim_sellers.seller_state`, implemented via a dbt snapshot (`check` strategy) and verified with a live simulated data change.
 
-  ![SCD Type 2 verification](docs/scd_type2_seller_state_change.png)
+  ![SCD Type 2 verification](olist_project/docs/scd_type2_seller_state_change.png)
 
 ## Orchestration
 
