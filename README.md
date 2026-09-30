@@ -34,8 +34,60 @@ Quality checks gate promotion between layers - if a test stage fails, the next r
 
 ## Data Model
 
+```mermaid
+erDiagram
+    DIM_CUSTOMERS ||--o{ FACT_ORDER_ITEMS : "places"
+    DIM_SELLERS ||--o{ FACT_ORDER_ITEMS : "fulfills"
+    DIM_PRODUCTS ||--o{ FACT_ORDER_ITEMS : "is ordered as"
+    FACT_ORDER_ITEMS ||--o{ FACT_PAYMENTS : "order_id"
+    FACT_ORDER_ITEMS ||--o{ FACT_REVIEWS : "order_id"
+ 
+    DIM_CUSTOMERS {
+        string customer_id PK
+        string customer_city
+        string customer_state
+        string customer_zip_code_prefix
+    }
+    DIM_SELLERS {
+        string seller_id PK
+        string seller_city
+        string seller_state
+        string seller_zip_code_prefix
+    }
+    DIM_PRODUCTS {
+        string product_id PK
+        string product_category_name
+        int product_name_length
+        int product_description_length
+    }
+    FACT_ORDER_ITEMS {
+        string order_id
+        string order_item_id
+        string product_id FK
+        string seller_id FK
+        string customer_id FK
+        float price
+        float freight_value
+        float total_item_value
+        int delivery_days
+    }
+    FACT_PAYMENTS {
+        string order_id FK
+        string payment_type
+        int payment_installments
+        float payment_value
+    }
+    FACT_REVIEWS {
+        string review_id PK
+        string order_id FK
+        int review_score
+    }
+```
+ 
+`dim_geolocation` and `dim_date` are standalone/conformed dimensions, not directly joined to the facts within the dbt models. `dim_geolocation` supports ad hoc joins by zip code (e.g. for map-based BI visuals), and `dim_date` is a generated calendar dimension for ad hoc time-based joins and reporting.
+ 
 **Dimensions:** `dim_customers`, `dim_sellers`, `dim_products`, `dim_geolocation`, `dim_date`
-
+ 
 **Facts:** `fact_order_items`, `fact_payments`, `fact_reviews`
 
 ## Data Quality
