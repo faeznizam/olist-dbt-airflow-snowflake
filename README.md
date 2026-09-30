@@ -76,4 +76,13 @@ Getting Airflow running wasn't smooth, and that troubleshooting process is part 
    docker compose up airflow-init
    docker compose up -d
 ```
-   Open `http://localhost:8080`, enable the `olist_pipeline` DAG,
+   Open `http://localhost:8080`, enable the `olist_pipeline` DAG, and trigger a run.
+
+## Repository Structure
+
+```
+olist-dbt-airflow-snowflake/
+├── olist_project/          # dbt project (staging models, marts, snapshots, tests)
+├── airflow/                # Airflow DAG, Dockerfile, docker-compose.yaml
+└── docs/screenshots/       # Evidence screenshots
+```
