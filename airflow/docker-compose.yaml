@@ -23,6 +23,7 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
     - ../olist_project:/opt/airflow/dbt_project
+    - ./profiles.yml:/home/airflow/.dbt/profiles.yml
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -114,7 +115,3 @@ services:
 volumes:
   postgres-db-volume:
 
-networks:
-  default:
-    external: true
-    name: airflow_fixed_network

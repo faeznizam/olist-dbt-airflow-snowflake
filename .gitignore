@@ -2,3 +2,4 @@ venv/
 logs/ 
 *.pyc 
 __pycache__/
+airflow/profiles.yml
