@@ -1,6 +1,15 @@
-# Olist E-Commerce Analytics Engineering Pipeline
+# Olist E-Commerce ELT Pipeline: Snowflake + dbt + Airflow
 
-An end-to-end analytics engineering pipeline built on the Olist Brazilian E-Commerce public dataset, using **dbt Core**, **Snowflake**, and **Apache Airflow**. Built as a personal portfolio project to demonstrate practical data engineering and data quality practices: building a star schema, embedding automated data quality tests, tracking historical changes (SCD Type 2), and orchestrating the pipeline with Airflow in Docker.
+An end-to-end ELT pipeline on the [Olist Brazilian E-Commerce public dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) (~100k orders, 9 source tables). Raw data is loaded into **Snowflake**, transformed into a **star schema** with **dbt Core**, and orchestrated by **Apache Airflow** running in **Docker**, with automated tests acting as quality gates between layers.
+
+**What this project demonstrates**
+
+- **ELT into a cloud warehouse**: 9 raw tables landed in Snowflake, transformed in-warehouse with SQL.
+- **Layered modelling**: staging views (cleaning, renaming, typing, dedup) feeding mart tables (5 dimensions + 3 facts).
+- **Dimensional modelling**: star schema with conformed date and geolocation dimensions.
+- **History tracking**: SCD Type 2 on sellers via a dbt snapshot, verified with a simulated change.
+- **Orchestration**: Airflow DAG that runs and tests each layer in order, so a failed test stops bad data from reaching the marts.
+- **Containerised runtime**: Airflow + dbt packaged with a Dockerfile and docker-compose.
 
 ## Tech Stack
 
@@ -90,7 +99,7 @@ erDiagram
  
 **Facts:** `fact_order_items`, `fact_payments`, `fact_reviews`
 
-## Data Quality
+## Data Quality Gates
 
 - **19 automated dbt tests**: `not_null`, `unique`, `relationships` (referential integrity), `accepted_values`, plus 2 custom singular tests (`assert_no_negative_prices`, `assert_delivery_after_purchase`).
 - **3 real data quality defects found and fixed** during ingestion:
@@ -107,9 +116,11 @@ The pipeline is orchestrated by an Airflow DAG (`airflow/dags/olist_pipeline.py`
 
 ![Airflow DAG successful run](olist_project/docs/airflow_dag_success.png)
 
-### A note on getting here
+### Troubleshooting notes
 
-Getting Airflow running wasn't smooth, and that troubleshooting process is part of what this project demonstrates. The Docker build initially failed with SSL errors on a corporate-managed laptop, traced to endpoint security software intercepting container network traffic - confirmed when IT-level certificate access was explicitly blocked. Moving to GitHub Codespaces fixed the build, but surfaced a separate Postgres connection-timeout issue between Airflow's API server and its metadata database, reproduced identically across multiple fresh cloud environments despite isolating executor type, network configuration, and environment freshness as variables. Re-testing the exact same setup on a personal, non-corporate laptop resolved it cleanly - confirming both issues were environment-specific, not flaws in the pipeline design itself.
+- **Docker build failed with SSL errors** on a corporate-managed laptop. Cause: endpoint security software intercepting container traffic.
+- **Airflow API server timed out connecting to its Postgres metadata DB** in GitHub Codespaces, reproduced across fresh environments after ruling out executor type and network config.
+- **Fix**: the same setup ran cleanly on a personal laptop, so both issues were environment-specific rather than pipeline bugs.
 
 ## Setup
 
@@ -135,6 +146,12 @@ Getting Airflow running wasn't smooth, and that troubleshooting process is part 
 ```
 olist-dbt-airflow-snowflake/
 ├── olist_project/          # dbt project (staging models, marts, snapshots, tests)
-├── airflow/                # Airflow DAG, Dockerfile, docker-compose.yaml
-└── docs/screenshots/       # Evidence screenshots
+│   └── docs/               # Evidence screenshots (Airflow run, SCD2 check)
+└── airflow/                # Airflow DAG, Dockerfile, docker-compose.yaml
 ```
+
+## What I'd do next
+
+- Automate the raw load (Snowpipe or `COPY INTO` from cloud storage) instead of the Snowflake upload wizard.
+- Make fact tables incremental (`materialized='incremental'`) so daily runs only process new orders.
+- Add CI that runs `dbt build` against a dev schema on every pull request.
