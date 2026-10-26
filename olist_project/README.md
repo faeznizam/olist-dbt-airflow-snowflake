@@ -1,15 +1,8 @@
-Welcome to your new dbt project!
+# olist_project (dbt)
 
-### Using the starter project
+The dbt project for the Olist ELT pipeline. See the [main README](../README.md) for architecture, data model and setup.
 
-Try running the following commands:
-- dbt run
-- dbt test
-
-
-### Resources:
-- Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
-- Check out [Discourse](https://discourse.getdbt.com/) for commonly asked questions and answers
-- Join the [chat](https://community.getdbt.com/) on Slack for live discussions and support
-- Find [dbt events](https://events.getdbt.com) near you
-- Check out [the blog](https://blog.getdbt.com/) for the latest news on dbt's development and best practices
+- `models/staging/`: one view per raw source table (renaming, typing, dedup) plus source and column tests
+- `models/marts/`: star schema tables (5 dimensions, 3 facts)
+- `snapshots/`: SCD Type 2 snapshot of sellers
+- `tests/`: custom singular tests (`assert_no_negative_prices`, `assert_delivery_after_purchase`)
